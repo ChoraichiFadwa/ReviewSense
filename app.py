@@ -240,8 +240,7 @@ H(f"""
   <div>
     <div class="stars" aria-hidden="true">★★★★★</div>
     <h1>Réputation des entreprises</h1>
-    <p>Un modèle lit un avis client et dit s'il est positif (1) ou négatif (-1). On agrège ensuite ces
-     prédictions pour mesurer la réputation de chaque entreprise. Données : {fmt(AV['lignes'])} avis
+    <p>Un modèle lit un avis client et dit s'il est positif (1) ou négatif (-1). On agrège ensuite ces prédictions pour mesurer la réputation de chaque entreprise. Données : {fmt(AV['lignes'])} avis
     Trustpilot en anglais, sur {fmt(AV['entreprises distinctes'])} entreprises.</p>
   </div>
   <div class="score">
