@@ -1,0 +1,161 @@
+{
+  "avant_nettoyage": {
+    "lignes": 123181,
+    "entreprises distinctes": 1680,
+    "secteurs distincts": 22,
+    "avis par entreprise (médiane)": 89.0,
+    "avis par entreprise (max)": 100,
+    "répartition des notes source": {
+      "1": 24065,
+      "2": 19687,
+      "3": 21264,
+      "4": 26013,
+      "5": 32152
+    },
+    "répartition des labels (1 / -1)": {
+      "-1": 43752,
+      "1": 58165,
+      "exclu / invalide": 21264
+    },
+    "textes vides": 0,
+    "textes sans aucune lettre": 2,
+    "longueur (car.) médiane": 306.0,
+    "longueur (car.) p95": 889.0,
+    "avis < 20 caractères": 96,
+    "doublons (lignes en trop)": 14,
+    "groupes de doublons": 13,
+    "groupes de doublons à labels contradictoires": 0,
+    "groupes de doublons sur plusieurs entreprises": 7,
+    "entités HTML (&amp; …)": 1,
+    "balises HTML": 0,
+    "URL": 5,
+    "ponctuation collée au mot suivant": 26291,
+    "lettres répétées (sooooo)": 254,
+    "avis avec émojis": 3508,
+    "avis dans une autre langue que 'en'": 44
+  },
+  "après_nettoyage": {
+    "lignes": 101861,
+    "entreprises distinctes": 1680,
+    "secteurs distincts": 22,
+    "avis par entreprise (médiane)": 72.0,
+    "avis par entreprise (max)": 80,
+    "répartition des notes source": {
+      "1": 24058,
+      "2": 19686,
+      "4": 25997,
+      "5": 32120
+    },
+    "répartition des labels (1 / -1)": {
+      "-1": 43744,
+      "1": 58117
+    },
+    "textes vides": 0,
+    "textes sans aucune lettre": 0,
+    "longueur (car.) médiane": 302.0,
+    "longueur (car.) p95": 884.0,
+    "avis < 20 caractères": 81,
+    "doublons (lignes en trop)": 0,
+    "groupes de doublons": 0,
+    "groupes de doublons à labels contradictoires": 0,
+    "groupes de doublons sur plusieurs entreprises": 0,
+    "entités HTML (&amp; …)": 0,
+    "balises HTML": 0,
+    "URL": 0,
+    "ponctuation collée au mot suivant": 0,
+    "lettres répétées (sooooo)": 0,
+    "avis avec émojis": 3131,
+    "avis dans une autre langue que 'en'": 0
+  },
+  "journal_nettoyage": [
+    {
+      "step": "titre ajouté devant l'avis (non redondant)",
+      "rows_in": 123181,
+      "rows_modified": 64413,
+      "rows_rejected": 0
+    },
+    {
+      "step": "normalisation du texte",
+      "rows_in": 123181,
+      "rows_modified": 62343,
+      "rows_rejected": 0
+    },
+    {
+      "step": "note neutre écartée (règle de gestion)",
+      "rows_in": 123181,
+      "rows_modified": 0,
+      "rows_rejected": 21264
+    },
+    {
+      "step": "note hors du référentiel",
+      "rows_in": 101917,
+      "rows_modified": 0,
+      "rows_rejected": 0
+    },
+    {
+      "step": "texte vide ou inexploitable",
+      "rows_in": 101917,
+      "rows_modified": 0,
+      "rows_rejected": 0
+    },
+    {
+      "step": "aucune lettre (ponctuation, chiffres ou émojis seuls)",
+      "rows_in": 101917,
+      "rows_modified": 0,
+      "rows_rejected": 1
+    },
+    {
+      "step": "avis dans une autre langue que 'en'",
+      "rows_in": 101916,
+      "rows_modified": 0,
+      "rows_rejected": 42
+    },
+    {
+      "step": "doublons avec labels contradictoires (tous écartés)",
+      "rows_in": 101874,
+      "rows_modified": 0,
+      "rows_rejected": 0
+    },
+    {
+      "step": "doublons (1ère occurrence conservée)",
+      "rows_in": 101874,
+      "rows_modified": 0,
+      "rows_rejected": 13
+    }
+  ],
+  "rejets_par_motif": {
+    "excluded_label": 21264,
+    "wrong_language": 42,
+    "duplicate": 13,
+    "no_letters": 1
+  },
+  "split": {
+    "splits": {
+      "train": {
+        "avis": 81895,
+        "entités": 1344,
+        "pct_positifs": 56.8398559130594
+      },
+      "val": {
+        "avis": 10062,
+        "entités": 168,
+        "pct_positifs": 57.7022460743391
+      },
+      "test": {
+        "avis": 9904,
+        "entités": 168,
+        "pct_positifs": 58.17851373182552
+      }
+    },
+    "entités_partagées": 0,
+    "textes_partagés": 0
+  },
+  "autres_constats": {
+    "titres redondants (début de l'avis tronqué) non ajoutés au texte": 58768,
+    "entreprises au plafond de la source (nb d'avis = max observé)": 558,
+    "maximum d'avis pour une même entreprise et une même note": 20,
+    "entreprises avec exactement 20 avis pour chacune des 5 notes": 558,
+    "entreprises avec plusieurs valeurs de « category »": 0,
+    "entreprises avec plusieurs valeurs de « description »": 0
+  }
+}

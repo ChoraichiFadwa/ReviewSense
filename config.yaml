@@ -1,0 +1,55 @@
+# Configuration du projet « Analyse de la réputation des entreprises »
+# Pour brancher un autre jeu de données (ex. un export client), on ne modifie
+# QUE la section `source` : format, colonnes, correspondance des notes.
+
+seed: 42
+
+paths:
+  raw: data/raw/trustpilot_reviews.csv
+  interim: data/interim/reviews_standardized.parquet
+  processed: data/processed/reviews_clean.parquet
+  rejected: data/rejected/reviews_rejected.csv
+  splits_dir: data/processed/splits
+  models_dir: models
+  outputs_dir: outputs
+  reports_dir: reports
+  datamart: outputs/reputation_datamart.sqlite
+
+source:
+  name: trustpilot
+  format: csv              # csv | jsonl | xlsx | parquet
+  encoding: utf-8
+  csv_separator: ","
+  columns:                 # colonne source -> schéma standard
+    text: review
+    title: title           # optionnel : supprimer la ligne s'il n'y a pas de titre
+    label: stars
+    entity: company
+  # Attributs de l'entreprise, recopiés dans la table dimension (pas dans les faits)
+  entity_attributes:
+    category: category
+    description: description
+  entity_pattern: null     # regex d'extraction d'un identifiant (null = valeur brute)
+  # Règle de gestion : 1-2 étoiles = négatif (-1), 4-5 étoiles = positif (1)
+  label_mapping:
+    1: -1
+    2: -1
+    4: 1
+    5: 1
+  # Notes volontairement écartées (ni positives ni négatives) -> quarantaine tracée
+  excluded_labels: [3]
+
+cleaning:
+  min_chars: 2             # en dessous : texte vide / inexploitable
+  max_repeated_chars: 3    # "sooooo" -> "sooo"
+  url_token: " linkurl "   # remplacement des URL (token lisible par le vectoriseur)
+  expected_language: en    # avis rejeté s'il est clairement dans une autre langue
+  language_min_ratio: 2.0  # "clairement" = 2x plus de mots-outils de l'autre langue
+
+split:
+  test_size: 0.10
+  val_size: 0.10
+  group_by_entity: true    # une entreprise n'apparaît que dans un seul split
+
+reputation:
+  min_reviews: 20          # nb minimum d'avis pour publier un score d'entreprise

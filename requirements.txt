@@ -1,0 +1,17 @@
+pandas==3.0.5
+numpy==2.5.3
+scikit-learn==1.9.1
+pyarrow==26.0.0
+PyYAML==6.0.3
+ftfy==6.3.1
+joblib==1.6.0
+matplotlib==3.11.2
+
+# Démo interactive (app.py)
+streamlit==1.66.1
+
+# Tests et notebook
+pytest==9.1.1
+nbformat==5.11.1
+nbconvert==7.17.2
+ipykernel==7.4.0

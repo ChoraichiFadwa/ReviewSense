@@ -1,0 +1,26 @@
+{
+  "modele_retenu": "logreg_C10",
+  "regle_selection": "meilleur F1 macro validation ; modèle probabiliste préféré à 0.005 près",
+  "entraine_sur": "train + validation",
+  "taille": {
+    "train": 81895,
+    "val": 10062,
+    "test": 9904
+  },
+  "validation": {
+    "accuracy": 0.9307294772411051,
+    "f1_macro": 0.9292625190551911,
+    "roc_auc": 0.9775032399397563
+  },
+  "test": {
+    "accuracy": 0.9354806138933764,
+    "f1_macro": 0.9338283501093178,
+    "precision_negatif": 0.9173218965928044,
+    "rappel_negatif": 0.9295026557218735,
+    "f1_negatif": 0.9233721069672622,
+    "precision_positif": 0.9488347643245137,
+    "rappel_positif": 0.939777854911489,
+    "f1_positif": 0.9442845932513733,
+    "roc_auc": 0.9777940807008939
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "entreprises_test": 168,
+  "entreprises_publiables": 163,
+  "seuil_avis": 20,
+  "correlation_predit_reel": 0.9813216921658663,
+  "ecart_absolu_moyen_points": 2.4657117093329166,
+  "ecart_absolu_max_points": 16.455696202531644,
+  "secteurs": 22
+}

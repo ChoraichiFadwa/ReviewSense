@@ -1,0 +1,14 @@
+data/raw/*.csv
+data/interim/
+data/processed/
+data/rejected/
+data/sample_run/
+
+
+__pycache__/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+
+notebooks/build_notebook.py
+DEPLOY.md

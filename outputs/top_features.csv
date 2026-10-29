@@ -1,0 +1,31 @@
+terme,poids,polarite
+great,24.190859,positif
+easy,17.054737,positif
+good,16.289448,positif
+amazing,15.12848,positif
+excellent,14.597787,positif
+4 stars,13.881972,positif
+fantastic,13.011655,positif
+helpful,11.612652,positif
+quickly,10.742986,positif
+brilliant,10.703146,positif
+delicious,10.577789,positif
+my only,10.543863,positif
+perfect,10.471596,positif
+lovely,10.39389,positif
+well,9.603106,positif
+not,-21.55861,négatif
+poor,-17.410364,négatif
+disappointing,-14.573896,négatif
+rude,-13.924975,négatif
+avoid,-13.626012,négatif
+terrible,-12.98918,négatif
+no,-12.925188,négatif
+disappointed,-12.535115,négatif
+2 stars,-12.297861,négatif
+awful,-12.274269,négatif
+very disappointed,-12.198673,négatif
+not great,-11.239828,négatif
+worst,-11.081147,négatif
+not good,-10.749832,négatif
+useless,-10.466738,négatif
