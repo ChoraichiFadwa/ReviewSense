@@ -1,4 +1,4 @@
-"""Démo du projet « Analyse de la réputation des entreprises ».
+"""Démo interactive du projet « Analyse de la réputation des entreprises ».
 
     streamlit run app.py
 
@@ -39,7 +39,8 @@ h1, h2, h3, h4, .display {{ font-family: 'Bricolage Grotesque', 'IBM Plex Sans',
 /* en-tête */
 .hero {{ display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; align-items: end;
         padding-bottom: 1.4rem; border-bottom: 1px solid {LINE}; margin-bottom: .6rem; }}
-.hero h1 {{ font-size: 2.6rem; line-height: 1.05; font-weight: 700; margin: 0 0 .7rem; letter-spacing: -.02em; }}
+.hero .htitle {{ font-family: 'Bricolage Grotesque', sans-serif; color: {INK}; font-size: 2.6rem; line-height: 1.05; font-weight: 700; margin: 0 0 .7rem !important; padding: 0 !important;
+            letter-spacing: -.02em; }}
 .hero p {{ color: {MUTED}; font-size: 1rem; line-height: 1.55; margin: 0; max-width: 34rem; }}
 .stars {{ color: {GOLD}; letter-spacing: .12em; font-size: 1.05rem; margin-bottom: .5rem; }}
 .score {{ display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid {LINE}; border-left: 1px solid {LINE}; }}
@@ -108,7 +109,7 @@ st.markdown(CSS, unsafe_allow_html=True)
 
 def H(markup: str) -> None:
     """Affiche du HTML (lignes collées : sinon le Markdown prend l'indentation pour du code)."""
-    st.markdown("".join(line.strip() for line in markup.splitlines()), unsafe_allow_html=True)
+    st.markdown(" ".join(line.strip() for line in markup.splitlines() if line.strip()), unsafe_allow_html=True)
 
 
 # --------------------------------------------------------------------------- chargement
@@ -193,12 +194,10 @@ def explain(text: str) -> dict:
 
 
 def highlight(cleaned: str, terms: pd.DataFrame) -> str:
-    """Teinte chaque mot selon sa contribution (le poids d'un bigramme est partagé entre ses deux mots)."""
-    per_word: dict[str, float] = {}
-    for t, c in zip(terms["terme"], terms["contribution"]):
-        parts = t.split(" ")
-        for p in parts:
-            per_word[p] = per_word.get(p, 0.0) + c / len(parts)
+    """Teinte chaque mot selon son poids propre (mot seul). Les paires de mots (bigrammes),
+    qui peuvent inverser le sens (« not good »), sont détaillées dans le graphique."""
+    words = terms[terms["type"] == "mot"]
+    per_word = dict(zip(words["terme"], words["contribution"]))
     scale = max([abs(v) for v in per_word.values()] + [1e-9])
     out = []
     for piece in re.split(r"(\w+)", cleaned):
@@ -214,22 +213,32 @@ def highlight(cleaned: str, terms: pd.DataFrame) -> str:
 
 
 def bar_chart(df: pd.DataFrame, x: str, y: str, color_field: str, domain: list, colors: list,
-              x_title: str, height: int, fmt_tip: str = "+.2f"):
+              x_title: str, height: int, fmt_tip: str = "+.2f", labels: str | None = None):
+    """Barres horizontales ; `labels` = format d3 des valeurs affichées au bout des barres."""
+    layers = [{"mark": {"type": "bar", "cornerRadiusEnd": 3, "height": {"band": 0.7}},
+               "encoding": {"color": {"field": color_field, "type": "nominal",
+                                      "scale": {"domain": domain, "range": colors}, "legend": None},
+                            "tooltip": [{"field": y}, {"field": x, "format": fmt_tip}]}}]
+    if labels:
+        layers.append({"mark": {"type": "text", "fontSize": 11, "color": MUTED,
+                                "align": {"expr": f"datum['{x}'] < 0 ? 'right' : 'left'"},
+                                "dx": {"expr": f"datum['{x}'] < 0 ? -4 : 4"}},
+                       "encoding": {"text": {"field": x, "format": labels}}})
     st.vega_lite_chart(df, {
-        "mark": {"type": "bar", "cornerRadiusEnd": 3, "height": {"band": 0.7}},
+        "layer": layers,
         "encoding": {
             "y": {"field": y, "type": "nominal", "sort": None, "title": None,
                   "axis": {"labelOverlap": False, "labelLimit": 240, "labelFontSize": 12, "labelColor": INK,
                            "ticks": False, "domain": False}},
             "x": {"field": x, "type": "quantitative", "title": x_title,
+                  "scale": {"padding": 34 if labels else 0},
                   "axis": {"gridColor": LINE, "labelColor": MUTED, "titleColor": MUTED, "domain": False,
                            "titleFontWeight": "normal"}},
-            "color": {"field": color_field, "type": "nominal", "scale": {"domain": domain, "range": colors},
-                      "legend": None},
-            "tooltip": [{"field": y}, {"field": x, "format": fmt_tip}],
         },
         "height": height,
-        "config": {"view": {"stroke": None}, "font": "IBM Plex Sans"},
+        "config": {"view": {"stroke": None}, "font": "IBM Plex Sans, system-ui, sans-serif",
+                   "locale": {"number": {"decimal": ",", "thousands": "\u202f", "grouping": [3],
+                                         "currency": ["", " €"]}}},
     }, width="stretch")
 
 
@@ -239,8 +248,9 @@ H(f"""
 <div class="hero">
   <div>
     <div class="stars" aria-hidden="true">★★★★★</div>
-    <h1>Réputation des entreprises</h1>
-    <p>Un modèle lit un avis client et dit s'il est positif (1) ou négatif (-1). On agrège ensuite ces prédictions pour mesurer la réputation de chaque entreprise. Données : {fmt(AV['lignes'])} avis
+    <div class="htitle" role="heading" aria-level="1">Réputation des entreprises</div>
+    <p>Un modèle lit un avis client et dit s'il est positif (1) ou négatif (-1). On agrège ensuite ces
+    prédictions pour mesurer la réputation de chaque entreprise. Données : {fmt(AV['lignes'])} avis
     Trustpilot en anglais, sur {fmt(AV['entreprises distinctes'])} entreprises.</p>
   </div>
   <div class="score">
@@ -343,8 +353,8 @@ with tabs[1]:
   <div class="txt">{highlight(r['cleaned'], r['terms'])}</div>
   <div class="gauge"><div class="mk" style="left:{r['proba'] * 100:.1f}%"></div></div>
   <div class="gauge-l"><span>négatif</span><span>seuil 50 %</span><span>positif</span></div>
-  <div class="legend">Chaque mot est teinté selon son poids :<i style="background:rgba(36,89,200,.5)"></i>vers positif
-  <i style="background:rgba(201,58,58,.5)"></i>vers négatif. Survolez un mot pour voir sa contribution.</div>
+  <div class="legend">Teinte de chaque mot pris seul : <i style="background:rgba(36,89,200,.5)"></i>vers positif
+  <i style="background:rgba(201,58,58,.5)"></i>vers négatif. Les paires de mots sont détaillées plus bas.</div>
 </div>
 """)
 
@@ -381,7 +391,7 @@ et les mots-outils.</p></div>""")
             _, mid = st.columns([1, 20])
             with mid:
                 bar_chart(chart, "contribution", "terme", "sens", ["négatif", "positif"], [NEG, POS],
-                          "contribution au score", max(150, 28 * len(chart)))
+                          "contribution au score", max(150, 28 * len(chart)), labels="+.2f")
 
         H(f"""<div class="step"><div class="n">4</div><h4>Décision</h4>
 <p>On additionne la constante du modèle et les contributions, puis la fonction logistique transforme ce score
@@ -405,19 +415,21 @@ validée sur {rep['entreprises_publiables']} entreprises jamais vues à l'entra�
         sectors = ["Tous les secteurs"] + sorted(rc["entity_category"].dropna().unique())
         sel = st.selectbox("Secteur", sectors)
         view = rc[rc["publiable"]] if sel == "Tous les secteurs" else rc[rc["publiable"] & (rc["entity_category"] == sel)]
+        view = view.assign(part_positifs_predite=view["part_positifs_predite"] * 100,
+                           part_positifs_reelle=view["part_positifs_reelle"] * 100)
         show = view.rename(columns={
             "entity_id": "Entreprise", "entity_category": "Secteur", "nb_avis": "Avis",
             "part_positifs_predite": "Positifs prédits", "part_positifs_reelle": "Positifs réels",
             "score_reputation_wilson": "Score"})
         st.dataframe(
-            show[["Entreprise", "Secteur", "Avis", "Score", "Positifs prédits", "Positifs réels"]],
+            show[["Entreprise", "Avis", "Score", "Positifs prédits", "Positifs réels", "Secteur"]],
             hide_index=True, width="stretch", height=420,
             column_config={
                 "Score": st.column_config.ProgressColumn(
                     format="%.2f", min_value=0, max_value=1,
                     help="Borne basse de Wilson (95 %) de la part d'avis positifs prédits"),
-                "Positifs prédits": st.column_config.NumberColumn(format="percent"),
-                "Positifs réels": st.column_config.NumberColumn(format="percent"),
+                "Positifs prédits": st.column_config.NumberColumn(format="%.0f %%"),
+                "Positifs réels": st.column_config.NumberColumn(format="%.0f %%"),
             })
         st.markdown('<p class="small">Le score est la borne basse de Wilson : une entreprise à 3 avis positifs '
                     "sur 3 n'est pas « meilleure » qu'une entreprise à 90 % sur 200 avis.</p>",
@@ -443,7 +455,7 @@ validée sur {rep['entreprises_publiables']} entreprises jamais vues à l'entra�
                                  {"field": "part_positifs_predite", "title": "prédit", "format": ".0%"}]}},
             ],
             "height": 380,
-            "config": {"view": {"stroke": None}, "font": "IBM Plex Sans",
+            "config": {"view": {"stroke": None}, "font": "IBM Plex Sans, system-ui, sans-serif",
                        "axis": {"gridColor": LINE, "labelColor": MUTED, "titleColor": MUTED, "domain": False,
                                 "titleFontWeight": "normal"}},
         }, width="stretch")
@@ -455,9 +467,11 @@ validée sur {rep['entreprises_publiables']} entreprises jamais vues à l'entra�
     cat = load_csv(OUT / "reputation_by_category.csv").rename(columns={
         "entity_category": "Secteur", "nb_avis": "Avis", "part_positifs_predite": "Positifs prédits",
         "part_positifs_reelle": "Positifs réels"})
+    cat["Positifs prédits"] *= 100
+    cat["Positifs réels"] *= 100
     st.dataframe(cat[["Secteur", "Avis", "Positifs prédits", "Positifs réels"]], hide_index=True, width="stretch",
-                 column_config={"Positifs prédits": st.column_config.NumberColumn(format="percent"),
-                                "Positifs réels": st.column_config.NumberColumn(format="percent")})
+                 column_config={"Positifs prédits": st.column_config.NumberColumn(format="%.1f %%"),
+                                "Positifs réels": st.column_config.NumberColumn(format="%.1f %%")})
 
 # --------------------------------------------------------------------------- 4. qualité des données
 
@@ -477,7 +491,7 @@ with tabs[3]:
     log = log[log["effet"] > 0]
     bar_chart(log.rename(columns={"step": "règle"}), "effet", "règle", "action",
               ["lignes modifiées", "lignes écartées"], ["#8a96ad", NEG], "nombre de lignes",
-              34 * len(log) + 40, fmt_tip=",.0f")
+              34 * len(log) + 40, fmt_tip=",.0f", labels=",.0f")
     st.markdown('<p class="small">Les règles sans effet sur ces données (note invalide, texte vide, doublons '
                 "contradictoires) restent actives pour une autre source.</p>", unsafe_allow_html=True)
 
@@ -499,7 +513,7 @@ with tabs[3]:
     st.dataframe(load_csv(REPORTS / "cleaning_examples.csv").rename(columns={"text_raw": "Avant", "text": "Après"}),
                  hide_index=True, width="stretch")
     st.markdown("**Exemples de lignes en quarantaine**")
-    qx = load_csv(REPORTS / "quarantine_examples.csv")
+    qx = load_csv(REPORTS / "quarantine_examples.csv").groupby("reject_reason").head(3)
     qx["Motif"] = qx["reject_reason"].map(RULE_LABELS).fillna(qx["reject_reason"])
     st.dataframe(qx[["Motif", "label_raw", "language", "text_raw"]].rename(
         columns={"label_raw": "Note", "language": "Langue détectée", "text_raw": "Texte"}),
@@ -519,14 +533,14 @@ with tabs[4]:
     with left:
         c = comp.assign(retenu=np.where(comp["modele"] == chosen, "retenu", "autre"))
         bar_chart(c, "f1_macro", "modele", "retenu", ["retenu", "autre"], [POS, "#b8c0cf"],
-                  "F1 macro en validation", 34 * len(c) + 40, fmt_tip=".4f")
+                  "F1 macro en validation", 34 * len(c) + 40, fmt_tip=".4f", labels=".3f")
     with right:
         pred = load_parquet(OUT / "test_predictions.parquet")
         cm = (pred.assign(Réel=pred["label"].map({-1: "Négatif", 1: "Positif"}),
                           Prédit=pred["pred"].map({-1: "Négatif", 1: "Positif"}))
               .groupby(["Réel", "Prédit"]).size().rename("avis").reset_index())
         cm["part"] = cm["avis"] / cm.groupby("Réel")["avis"].transform("sum")
-        cm["label"] = cm.apply(lambda r: f"{fmt(r['avis'])} · {r['part'] * 100:.0f} %", axis=1)
+        cm["label"] = cm.apply(lambda r: f"{fmt(r['avis'])} ({r['part'] * 100:.0f} %)", axis=1)
         st.markdown("**Matrice de confusion (test)**")
         st.vega_lite_chart(cm, {
             "layer": [
@@ -540,7 +554,7 @@ with tabs[4]:
             "encoding": {"x": {"field": "Prédit", "type": "nominal", "axis": {"labelAngle": 0, "orient": "top"}},
                          "y": {"field": "Réel", "type": "nominal"}},
             "height": 230,
-            "config": {"view": {"stroke": None}, "font": "IBM Plex Sans",
+            "config": {"view": {"stroke": None}, "font": "IBM Plex Sans, system-ui, sans-serif",
                        "axis": {"labelColor": INK, "titleColor": MUTED, "domain": False, "ticks": False,
                                 "labelFontSize": 12, "titleFontWeight": "normal"}},
         }, width="stretch")
@@ -550,9 +564,10 @@ with tabs[4]:
         st.markdown("**Les erreurs se concentrent sur les notes intermédiaires**")
         by_star = (pred.assign(ok=pred["label"] == pred["pred"]).groupby("label_raw")["ok"].mean().reset_index())
         by_star["Note"] = by_star["label_raw"].astype(int).map(lambda n: "★" * n)
+        by_star["ok"] *= 100
         st.dataframe(by_star[["Note", "ok"]].rename(columns={"ok": "Bonnes prédictions"}), hide_index=True,
                      width="stretch", column_config={"Bonnes prédictions": st.column_config.ProgressColumn(
-                         format="percent", min_value=0, max_value=1)})
+                         format="%.0f %%", min_value=0, max_value=100)})
         st.markdown('<p class="small">Les avis à 2 et 4 étoiles sont souvent nuancés.</p>', unsafe_allow_html=True)
     with right:
         st.markdown("**Les termes qui pèsent le plus**")
@@ -567,8 +582,8 @@ with tabs[4]:
                 "notés 1 ou 2 étoiles. Le modèle a raison, la donnée a tort.</p>", unsafe_allow_html=True)
     err = load_csv(OUT / "error_analysis.csv").head(12)
     err["Note"] = err["label"].map({-1: "1-2 étoiles (négatif)", 1: "4-5 étoiles (positif)"})
+    err["confiance_erreur"] *= 100
     st.dataframe(err[["Note", "confiance_erreur", "text"]].rename(columns={
         "confiance_erreur": "Confiance du modèle", "text": "Texte"}),
         hide_index=True, width="stretch",
-        column_config={"Confiance du modèle": st.column_config.NumberColumn(format="percent")})
-
+        column_config={"Confiance du modèle": st.column_config.NumberColumn(format="%.1f %%")})
