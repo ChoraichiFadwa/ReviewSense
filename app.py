@@ -241,7 +241,7 @@ H(f"""
     <div class="stars" aria-hidden="true">★★★★★</div>
     <h1>Réputation des entreprises</h1>
     <p>Un modèle lit un avis client et dit s'il est positif (1) ou négatif (-1). On agrège ensuite ces
-    prédictions pour mesurer la réputation de chaque entreprise. Données : {fmt(AV['lignes'])} avis
+     prédictions pour mesurer la réputation de chaque entreprise. Données : {fmt(AV['lignes'])} avis
     Trustpilot en anglais, sur {fmt(AV['entreprises distinctes'])} entreprises.</p>
   </div>
   <div class="score">
@@ -573,6 +573,3 @@ with tabs[4]:
         hide_index=True, width="stretch",
         column_config={"Confiance du modèle": st.column_config.NumberColumn(format="percent")})
 
-st.markdown('<p class="small" style="margin-top:2.5rem;border-top:1px solid #e3e7ef;padding-top:1rem">'
-            "Code, rapport qualité et notebook : voir le README du projet. "
-            "Données : Trustpilot Reviews 123k (licence MIT).</p>", unsafe_allow_html=True)
