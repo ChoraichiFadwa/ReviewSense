@@ -3,13 +3,13 @@
 Prédire la polarité d'un avis client (**1 = positif, -1 = négatif**) à partir de son texte,
 puis s'en servir pour mesurer la réputation de chaque entreprise.
 
-**▶ Démo en ligne : [LIEN_DE_LA_DEMO](https://reviewsense-fadwa.streamlit.app/)** : tester un avis et voir, étape par étape,
+ Démo en ligne : [reviewsense-fadwa.streamlit.app](https://reviewsense-fadwa.streamlit.app/) : tester un avis et voir, étape par étape,
 comment le modèle décide ; réputation par entreprise ; qualité des données.
 En local : `streamlit run app.py`.
 
 ![Aperçu de la démo](docs/demo_apercu.png)
 
-## En 2 minutes
+## Résumé
 
 | | |
 |---|---|
